@@ -45,7 +45,6 @@ app.get('/api/v1/tours/:id', async (req, res) => {
   const tour = tours.find((t) => t.id === parseInt(req.params.id));
   if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
   res.status(200).json({ status: 'success', data: { tour: tour } });
-  ``;
 });
 
 app.post('/api/v1/tours', async (req, res) => {
