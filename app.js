@@ -40,6 +40,14 @@ app.get('/api/v1/tours', async (req, res) => {
   res.status(200).json({ status: 'success', results: tours.length, data: { tours: tours } });
 });
 
+app.get('/api/v1/tours/:id', async (req, res) => {
+  const tours = await getTours();
+  const tour = tours.find((t) => t.id === parseInt(req.params.id));
+  if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
+  res.status(200).json({ status: 'success', data: { tour: tour } });
+  ``;
+});
+
 app.post('/api/v1/tours', async (req, res) => {
   const tour = await addTour(req.body);
   res.status(201).json({ status: 'success', data: { tour: tour } });
