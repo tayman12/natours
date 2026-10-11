@@ -35,6 +35,14 @@ const addTour = async (tour) => {
   return newTour;
 };
 
+const updateTour = async (tour) => {
+  const tours = await getTours();
+  const newTour = { id: tours[tours.length - 1].id + 1, ...tour };
+  tours.push(newTour);
+  await writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours));
+  return newTour;
+};
+
 app.get('/api/v1/tours', async (req, res) => {
   const tours = await getTours();
   res.status(200).json({ status: 'success', results: tours.length, data: { tours: tours } });
@@ -44,6 +52,18 @@ app.get('/api/v1/tours/:id', async (req, res) => {
   const tours = await getTours();
   const tour = tours.find((t) => t.id === parseInt(req.params.id));
   if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
+  res.status(200).json({ status: 'success', data: { tour: tour } });
+});
+
+app.patch('/api/v1/tours/:id', async (req, res) => {
+  let tours = await getTours();
+  let tour = tours.find((t) => t.id === parseInt(req.params.id));
+  if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
+  tours = tours.filter((t) => t.id !== parseInt(req.params.id));
+  tour = { ...tour, ...req.body };
+  tours.push(tour);
+  await writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours));
+
   res.status(200).json({ status: 'success', data: { tour: tour } });
 });
 
