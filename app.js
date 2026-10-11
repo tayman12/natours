@@ -43,19 +43,19 @@ const updateTour = async (tour) => {
   return newTour;
 };
 
-app.get('/api/v1/tours', async (req, res) => {
+const getAllTours = async (req, res) => {
   const tours = await getTours();
   res.status(200).json({ status: 'success', results: tours.length, data: { tours: tours } });
-});
+};
 
-app.get('/api/v1/tours/:id', async (req, res) => {
+const getTourById = async (req, res) => {
   const tours = await getTours();
   const tour = tours.find((t) => t.id === parseInt(req.params.id));
   if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
   res.status(200).json({ status: 'success', data: { tour: tour } });
-});
+};
 
-app.patch('/api/v1/tours/:id', async (req, res) => {
+const updateTourById = async (req, res) => {
   let tours = await getTours();
   let tour = tours.find((t) => t.id === parseInt(req.params.id));
   if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
@@ -65,12 +65,25 @@ app.patch('/api/v1/tours/:id', async (req, res) => {
   await writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours));
 
   res.status(200).json({ status: 'success', data: { tour: tour } });
-});
+};
 
-app.post('/api/v1/tours', async (req, res) => {
+const deleteTourById = async (req, res) => {
+  let tours = await getTours();
+  let tour = tours.find((t) => t.id === parseInt(req.params.id));
+  if (!tour) res.status(404).json({ status: 'fail', message: 'Tour not found' });
+  tours = tours.filter((t) => t.id !== parseInt(req.params.id));
+  await writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours));
+
+  res.status(204).json({ status: 'success' });
+};
+
+const createTour = async (req, res) => {
   const tour = await addTour(req.body);
   res.status(201).json({ status: 'success', data: { tour: tour } });
-});
+};
+
+app.route('/api/v1/tours').get(getAllTours).post(createTour);
+app.route('/api/v1/tours/:id').get(getTourById).patch(updateTourById).delete(deleteTourById);
 
 const port = 8080;
 app.listen(port, () => {
