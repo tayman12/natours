@@ -5,8 +5,15 @@ const tourRouter = require('./routes/tourRoutes');
 
 const app = express();
 
-app.use(morgan('dev'));
+console.log(`NODE_ENV is ${process.env.NODE_ENV} from app`);
+
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
+
 app.use('/api/v1/tours', tourRouter);
 
 app.use((req, res, next) => {
@@ -15,7 +22,4 @@ app.use((req, res, next) => {
   next();
 });
 
-const port = 8080;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}...`);
-});
+module.exports = app;

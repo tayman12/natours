@@ -1,54 +1,78 @@
-const { readFile, writeFile } = require('../utils/fs');
+const express = require('express');
+const tourService = require('../services/tourService');
 
-const toursFilePath = `${__dirname}/../dev-data/data/tours-simple.json`;
+exports.validateIdAndGetTour = tourService.validateIdAndGetTour;
 
-const getTours = () => readFile(toursFilePath).then((data) => JSON.parse(data));
-const writeAllTours = (tours) => writeFile(toursFilePath, JSON.stringify(tours));
-
-const addTour = async (tour) => {
-  const tours = await getTours();
-
-  const newTour = { id: tours[tours.length - 1].id + 1, ...tour };
-  tours.push(newTour);
-
-  await writeAllTours(tours);
-
-  return newTour;
+exports.getAllTours = async (req, res) => {
+  const tours = await tourService.getTours();
+  res.status(200).json({
+    status: 'success',
+    results: tours.length,
+    requestedAt: req.requestedAt,
+    data: { tours: tours },
+  });
 };
 
-const getTourById = async (id) => {
-  const tours = await getTours();
-
-  const tour = tours.find((t) => t.id === parseInt(id));
-  if (!tour) throw new Error('Tour not found');
-
-  return tour;
+exports.getTourById = (req, res) => {
+  try {
+    const tour = tourService.getTourById(req.tour);
+    res.status(200).json({ status: 'success', data: { tour: tour } });
+  } catch (error) {
+    if (error.message === 'Tour not found') {
+      res.status(404).json({ status: 'fail', message: 'Tour not found' });
+    } else {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
 };
 
-const updateTour = async (id, updatedFields) => {
-  let tours = await getTours();
+exports.validateTourCreation = (req, res, next) => {
+  if (!req.body.name) {
+    res
+      .status(400)
+      .json({ status: 'fail', message: 'Tour name must not be blank' });
+  }
 
-  const tour = tours.find((t) => t.id === parseInt(id));
-  if (!tour) throw new Error('Tour not found');
+  if (!req.body.price) {
+    res
+      .status(400)
+      .json({ status: 'fail', message: 'Tour price must not be blank' });
+  }
 
-  tours = tours.filter((t) => t.id !== parseInt(id));
-  const updatedTour = { ...tour, ...updatedFields };
-  tours.push(updatedTour);
-
-  writeAllTours(tours);
-
-  return updatedTour;
+  next();
 };
 
-const deleteTour = async (id) => {
-  let tours = await getTours();
-
-  const tour = tours.find((t) => t.id === parseInt(id));
-  if (!tour) throw new Error('Tour not found');
-
-  tours = tours.filter((t) => t.id !== parseInt(id));
-
-  await writeAllTours(tours);
+exports.createTour = async (req, res) => {
+  try {
+    const tour = await tourService.addTour(req.body);
+    res.status(201).json({ status: 'success', data: { tour: tour } });
+  } catch (error) {
+    res.status(400).json({ status: 'fail', message: error.message });
+  }
 };
 
-module.exports = { getTours, addTour, getTourById, updateTour, deleteTour };
+exports.updateTourById = async (req, res) => {
+  try {
+    const tour = await tourService.updateTour(req.params.id, req.body);
+    res.status(200).json({ status: 'success', data: { tour: tour } });
+  } catch (error) {
+    if (error.message === 'Tour not found') {
+      res.status(404).json({ status: 'fail', message: 'Tour not found' });
+    } else {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+};
+
+exports.deleteTourById = async (req, res) => {
+  try {
+    await tourService.deleteTour(req.params.id);
+    res.status(204).json({ status: 'success' });
+  } catch (error) {
+    if (error.message === 'Tour not found') {
+      res.status(404).json({ status: 'fail', message: 'Tour not found' });
+    } else {
+      res.status(500).json({ status: 'error', message: error.message });
+    }
+  }
+};

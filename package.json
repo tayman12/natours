@@ -15,10 +15,13 @@
   "type": "commonjs",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:dev": "nodemon server.js",
+    "start:prod": "NODE_ENV=production node server.js"
   },
   "dependencies": {
+    "dotenv": "^18.0.7",
     "express": "^5.2.1",
+    "mongoose": "^9.11.2",
     "morgan": "^1.12.1"
   }
 }
