@@ -1,53 +1,65 @@
 const { readFile, writeFile } = require('../utils/fs');
+const Tour = require('./../models/tourModel');
 
-const toursFilePath = `${__dirname}/../dev-data/data/tours-simple.json`;
+const getTours = async (queryParams) => {
+  try {
+    const queryObject = { ...queryParams };
+    const excludedFields = ['page', 'limit', 'sort', 'fields'];
+    excludedFields.forEach((element) => delete queryObject[element]);
 
-const getTours = () => readFile(toursFilePath).then((data) => JSON.parse(data));
-const writeAllTours = (tours) => writeFile(toursFilePath, JSON.stringify(tours));
+    console.log(queryParams, queryObject);
+
+    return await Tour.find(queryObject);
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
+};
 
 const addTour = async (tour) => {
-  const tours = await getTours();
-
-  const newTour = { id: tours[tours.length - 1].id + 1, ...tour };
-  tours.push(newTour);
-
-  await writeAllTours(tours);
-
-  return newTour;
+  try {
+    return await Tour.create(tour);
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };
 
-const validateIdAndGetTour = async (req, res, next, id) => {
-  const tours = await getTours();
-
-  tour = tours.find((t) => t.id === parseInt(id));
-  if (!tour) throw new Error('Tour not found');
-
-  console.log(`Tour id is ${id}`);
-
-  req.tour = tour;
-
-  next();
+const getTourById = async (id) => {
+  try {
+    console.log(id);
+    return await Tour.findById(id);
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };
-
-const getTourById = (tour) => tour;
 
 const updateTour = async (id, updatedFields) => {
-  let tours = await getTours();
-
-  tours = tours.filter((t) => t.id !== parseInt(id));
-  const updatedTour = { ...req.tour, ...updatedFields };
-  tours.push(updatedTour);
-
-  writeAllTours(tours);
-
-  return updatedTour;
+  try {
+    return await Tour.findByIdAndUpdate(id, updatedFields, {
+      new: true,
+      runValidators: true,
+    });
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };
 
 const deleteTour = async (id) => {
-  let tours = await getTours();
-  tours = tours.filter((t) => t.id !== parseInt(id));
-
-  await writeAllTours(tours);
+  try {
+    await Tour.findByIdAndDelete(id);
+  } catch (err) {
+    console.log(err);
+    throw err;
+  }
 };
 
-module.exports = { validateIdAndGetTour, getTours, addTour, getTourById, updateTour, deleteTour };
+module.exports = {
+  getTours,
+  addTour,
+  getTourById,
+  updateTour,
+  deleteTour,
+};
