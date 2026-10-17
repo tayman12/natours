@@ -13,6 +13,7 @@ if (process.env.NODE_ENV === 'development') {
 
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
+app.set('query parser', 'extended');
 
 app.use('/api/v1/tours', tourRouter);
 
