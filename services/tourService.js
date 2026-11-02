@@ -1,4 +1,3 @@
-const { readFile, writeFile } = require('../utils/fs');
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('./../utils/apiFeatures');
 

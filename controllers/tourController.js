@@ -1,4 +1,3 @@
-const express = require('express');
 const tourService = require('../services/tourService');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
@@ -15,7 +14,7 @@ exports.aliasTopFiveCheap = (req, res, next) => {
   next();
 };
 
-exports.getAllTours = catchAsync(async (req, res, next) => {
+exports.getAllTours = catchAsync(async (req, res) => {
   const tours = await tourService.getTours(req.query);
   res.status(200).json({
     status: 'success',
@@ -61,7 +60,5 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
 
 exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
   const plan = await tourService.getMonthlyPlan(req.query.year * 1);
-  res
-    .status(200)
-    .json({ status: 'success', results: plan.length, data: { plan: plan } });
+  res.status(200).json({ status: 'success', results: plan.length, data: { plan: plan } });
 });
