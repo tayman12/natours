@@ -1,21 +1,11 @@
 const Tour = require('./../models/tourModel');
-const APIFeatures = require('./../utils/apiFeatures');
+const serviceFactory = require('./serviceFactory');
 
-const addTour = async (tour) => await Tour.create(tour);
-const getTourById = async (id) => await Tour.findById(id);
-const deleteTour = async (id) => await Tour.findByIdAndDelete(id);
-
-const getTours = async (queryParams) => {
-  const features = new APIFeatures(Tour.find(), queryParams);
-  features.filter().sort().projection().pagination();
-  return await features.query;
-};
-
-const updateTour = async (id, updatedFields) => {
-  let tour = await Tour.findById(id);
-  Object.assign(tour, updatedFields);
-  return await tour.save();
-};
+const addOne = serviceFactory.addOne(Tour);
+const getOne = serviceFactory.getOne(Tour);
+const getAll = serviceFactory.getAll(Tour);
+const updateOne = serviceFactory.updateOne(Tour);
+const deleteOne = serviceFactory.deleteOne(Tour);
 
 const getTourStats = async () =>
   await Tour.aggregate([
@@ -64,12 +54,4 @@ const getMonthlyPlan = async (year) =>
     { $limit: 6 },
   ]);
 
-module.exports = {
-  getTours,
-  addTour,
-  getTourById,
-  updateTour,
-  deleteTour,
-  getTourStats,
-  getMonthlyPlan,
-};
+module.exports = { getAll, addOne, getOne, updateOne, deleteOne, getTourStats, getMonthlyPlan };

@@ -4,7 +4,7 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-router.route('/').get(userController.getAllUsers);
+router.route('/').get(authController.protect, userController.getAll);
 
 router
   .route('/me')
@@ -13,8 +13,8 @@ router
 
 router
   .route('/:id')
-  .get(userController.getUserById)
-  .patch(userController.updateUserById)
-  .delete(userController.deleteUserById);
+  .get(authController.protect, userController.getOne)
+  .patch(authController.protect, userController.updateOne)
+  .delete(authController.protect, userController.deleteOne);
 
 module.exports = router;

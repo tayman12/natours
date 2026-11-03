@@ -28,7 +28,7 @@ const extractToken = (authHeader) => {
 
 exports.signup = async (user) => {
   const newUser = await User.create(user);
-  const token = singToken(user._id);
+  const token = singToken(newUser._id);
 
   return { user: newUser, token: token };
 };

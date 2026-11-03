@@ -18,6 +18,11 @@ class APIFeatures {
     return this;
   }
 
+  skipPopulation() {
+    this.query.setOptions({ skipPopulation: true });
+    return this;
+  }
+
   sort() {
     if (this.queryString.sort) {
       this.query.sort(this.queryString.sort.split(',').join(' '));
