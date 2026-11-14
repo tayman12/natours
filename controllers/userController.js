@@ -1,18 +1,25 @@
 const userService = require('../services/userService');
-const controllerFactory = require('./controllerFactory');
+const factory = require('./controllerFactory');
 
-exports.getAll = controllerFactory.getAll(userService);
-exports.createOne = controllerFactory.createOne(userService);
-exports.getOne = controllerFactory.getOne(userService);
-exports.updateOne = controllerFactory.updateOne(userService);
-exports.deleteOne = controllerFactory.deleteOne(userService);
+exports.getAll = factory.getAll(userService);
+exports.createOne = factory.createOne(userService);
+exports.getOne = factory.getOne(userService);
+exports.updateOne = factory.updateOne(userService);
+exports.deleteOne = factory.deleteOne(userService);
 
-exports.updateMe = (req, res, next) => {
+exports.addUserId = (req, res, next) => {
   req.params.id = req.user.id;
-  controllerFactory.updateOne(userService)(req, res, next);
+  next();
 };
 
-exports.deleteMe = (req, res, next) => {
-  req.params.id = req.user.id;
-  controllerFactory.deleteOne(userService)(req, res, next);
+exports.addDeleteMeQuery = (req, res, next) => {
+  req.query.id = req.user.id;
+  next();
+};
+
+exports.validatePasswordFields = (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    throw new AppError('This route is not for password updates. Please use /auth/update-my-password.');
+  }
+  next();
 };

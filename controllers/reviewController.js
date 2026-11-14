@@ -1,17 +1,17 @@
 const reviewService = require('../services/reviewService');
-const controllerFactory = require('./controllerFactory');
+const factory = require('./controllerFactory');
 
-exports.getAll = (req, res, next) => {
-  if (req.params.tourId) req.query.tour = req.params.tourId;
-  controllerFactory.getAll(reviewService)(req, res, next);
-};
+exports.getAll = factory.getAll(reviewService);
+exports.createOne = factory.createOne(reviewService);
+exports.getOne = factory.getOne(reviewService);
+exports.updateOne = factory.updateOne(reviewService);
+exports.deleteOne = factory.deleteOne(reviewService);
 
-exports.createOne = (req, res, next) => {
+exports.addTourIdAndUserId = (req, res, next) => {
+  if (!req.body) req.body = {};
+
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
-  controllerFactory.createOne(reviewService)(req, res, next);
-};
 
-exports.getOne = controllerFactory.getOne(reviewService);
-exports.updateOne = controllerFactory.updateOne(reviewService);
-exports.deleteOne = controllerFactory.deleteOne(reviewService);
+  next();
+};

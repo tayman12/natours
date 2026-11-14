@@ -1,11 +1,11 @@
 const User = require('./../models/userModel');
 const serviceFactory = require('./serviceFactory');
 
-const getOne = serviceFactory.getOne(User);
-const getAll = serviceFactory.getAll(User);
-const updateOne = serviceFactory.findAndUpdateOne(User);
-const deleteOne = serviceFactory.deleteOne(User);
-const deleteMe = (user) => serviceFactory.findAndUpdateOne(User)(user.id, { active: false });
+exports.getOne = serviceFactory.getOne(User);
+exports.getAll = serviceFactory.getAll(User);
+exports.updateOne = serviceFactory.findAndUpdateOne(User);
+exports.deleteOne = serviceFactory.deleteOne(User);
+exports.deleteMe = (user) => serviceFactory.findAndUpdateOne(User)(user.id, { active: false });
 
 const filteredObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -15,7 +15,7 @@ const filteredObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-const updateMe = async (user, updatedFields) => {
+exports.updateMe = async (user, updatedFields) => {
   if (updatedFields.password || updatedFields.passwordConfirm) {
     throw new AppError('This route is not for password updates. Please use /auth/update-my-password.');
   }
@@ -23,5 +23,3 @@ const updateMe = async (user, updatedFields) => {
   const fields = filteredObj(updatedFields, 'name', 'email', 'photo');
   serviceFactory.findAndUpdateOne(User)(user.id, fields);
 };
-
-module.exports = { getAll, getOne, updateOne, deleteOne, updateMe, deleteMe };

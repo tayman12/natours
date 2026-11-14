@@ -1,13 +1,13 @@
 const Tour = require('./../models/tourModel');
-const serviceFactory = require('./serviceFactory');
+const factory = require('./serviceFactory');
 
-const addOne = serviceFactory.addOne(Tour);
-const getOne = serviceFactory.getOne(Tour);
-const getAll = serviceFactory.getAll(Tour);
-const updateOne = serviceFactory.updateOne(Tour);
-const deleteOne = serviceFactory.deleteOne(Tour);
+exports.addOne = factory.addOne(Tour);
+exports.getOne = factory.getOne(Tour, { path: 'reviews' });
+exports.getAll = factory.getAll(Tour);
+exports.updateOne = factory.updateOne(Tour);
+exports.deleteOne = factory.deleteOne(Tour);
 
-const getTourStats = async () =>
+exports.getTourStats = async () =>
   await Tour.aggregate([
     {
       $match: { ratingsAverage: { $gte: 4.5 } },
@@ -30,7 +30,7 @@ const getTourStats = async () =>
     },
   ]);
 
-const getMonthlyPlan = async (year) =>
+exports.getMonthlyPlan = async (year) =>
   await Tour.aggregate([
     { $unwind: '$startDates' },
     {
@@ -54,4 +54,12 @@ const getMonthlyPlan = async (year) =>
     { $limit: 6 },
   ]);
 
-module.exports = { getAll, addOne, getOne, updateOne, deleteOne, getTourStats, getMonthlyPlan };
+exports.getToursWithin = async (distance, latlng, unit) => {
+  const [lat, lng] = latlng.split(',');
+  if (!lat || !lng) throw new Error('Please provide latitude and longitude in the format lat,lng.');
+
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  console.log(distance, lat, lng, unit, radius);
+  return await Tour.find({ startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } } });
+};

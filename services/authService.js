@@ -80,7 +80,7 @@ exports.forgetPassword = async (email, baseURL) => {
   };
 
   try {
-    await sendEmail(options);
+    // await sendEmail(options);
   } catch (error) {
     console.log({ error });
     user.passwordResetToken = undefined;

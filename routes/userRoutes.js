@@ -4,17 +4,18 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-router.route('/').get(authController.protect, userController.getAll);
+router.use(authController.protect);
 
 router
   .route('/me')
-  .patch(authController.protect, userController.updateMe)
-  .delete(authController.protect, userController.deleteMe);
+  .get(userController.addUserId, userController.getOne)
+  .patch(userController.addUserId, userController.validatePasswordFields, userController.updateOne)
+  .delete(userController.addUserId, userController.addDeleteMeQuery, userController.updateOne);
 
-router
-  .route('/:id')
-  .get(authController.protect, userController.getOne)
-  .patch(authController.protect, userController.updateOne)
-  .delete(authController.protect, userController.deleteOne);
+router.use(authController.restrictTo('admin'));
+
+router.route('/').get(userController.getAll);
+
+router.route('/:id').get(userController.getOne).patch(userController.updateOne).delete(userController.deleteOne);
 
 module.exports = router;
